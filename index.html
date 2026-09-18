@@ -1,0 +1,1454 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NOVA — Future Search</title>
+
+<style>
+:root{
+    --bg:#030611;
+    --panel:rgba(10,16,34,.60);
+    --panel2:rgba(14,21,45,.82);
+    --line:rgba(120,160,255,.16);
+    --text:#f3f7ff;
+    --muted:#8c9ab8;
+    --blue:#4da6ff;
+    --purple:#8b5cff;
+    --cyan:#3cf5ff;
+    --pink:#d45cff;
+    --shadow:0 0 35px rgba(61,132,255,.12);
+}
+
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+}
+
+html{
+    scroll-behavior:smooth;
+}
+
+body{
+    min-height:100vh;
+    overflow-x:hidden;
+    background:
+        radial-gradient(circle at 50% 15%, rgba(87,92,255,.18), transparent 25%),
+        radial-gradient(circle at 10% 80%, rgba(0,221,255,.08), transparent 22%),
+        radial-gradient(circle at 90% 70%, rgba(190,0,255,.08), transparent 22%),
+        var(--bg);
+    color:var(--text);
+    font-family:Arial,Helvetica,sans-serif;
+}
+
+#space{
+    position:fixed;
+    inset:0;
+    z-index:-3;
+}
+
+.grid{
+    position:fixed;
+    inset:0;
+    z-index:-2;
+    pointer-events:none;
+    opacity:.35;
+    background-image:
+        linear-gradient(rgba(73,121,255,.07) 1px,transparent 1px),
+        linear-gradient(90deg,rgba(73,121,255,.07) 1px,transparent 1px);
+    background-size:55px 55px;
+    mask-image:linear-gradient(to bottom,transparent,black 20%,black 75%,transparent);
+}
+
+.scanlines{
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+    z-index:50;
+    opacity:.045;
+    background:repeating-linear-gradient(
+        to bottom,
+        transparent 0px,
+        transparent 3px,
+        rgba(255,255,255,.15) 4px
+    );
+}
+
+.app{
+    width:min(1400px,92%);
+    margin:auto;
+    padding:22px 0 60px;
+}
+
+/* HEADER */
+
+header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.brand{
+    display:flex;
+    align-items:center;
+    gap:12px;
+}
+
+.brand-orb{
+    width:45px;
+    height:45px;
+    border-radius:50%;
+    position:relative;
+    display:grid;
+    place-items:center;
+    background:
+        radial-gradient(circle at 35% 30%,#fff, #8beaff 15%,#4775ff 38%,#6028d8 65%,transparent 67%);
+    box-shadow:
+        0 0 12px rgba(60,245,255,.9),
+        0 0 35px rgba(103,69,255,.65);
+    animation:orbPulse 3s infinite ease-in-out;
+}
+
+.brand-orb::after{
+    content:"";
+    position:absolute;
+    width:58px;
+    height:58px;
+    border:1px solid rgba(88,205,255,.35);
+    border-radius:50%;
+    animation:spin 6s linear infinite;
+}
+
+.brand h2{
+    font-size:20px;
+    letter-spacing:5px;
+}
+
+.brand span{
+    color:var(--muted);
+    font-size:10px;
+    letter-spacing:2px;
+}
+
+.header-right{
+    display:flex;
+    gap:10px;
+}
+
+.top-btn{
+    border:1px solid var(--line);
+    color:var(--text);
+    background:rgba(10,16,35,.5);
+    width:42px;
+    height:42px;
+    border-radius:14px;
+    cursor:pointer;
+    backdrop-filter:blur(14px);
+    transition:.2s;
+}
+
+.top-btn:hover{
+    border-color:rgba(68,211,255,.6);
+    box-shadow:0 0 18px rgba(68,211,255,.14);
+}
+
+/* HERO */
+
+.hero{
+    text-align:center;
+    max-width:1000px;
+    margin:90px auto 35px;
+}
+
+.status{
+    display:inline-flex;
+    align-items:center;
+    gap:9px;
+    padding:8px 14px;
+    border:1px solid rgba(73,186,255,.2);
+    background:rgba(7,18,42,.55);
+    border-radius:999px;
+    color:#9cdfff;
+    font-size:11px;
+    letter-spacing:1.5px;
+    box-shadow:0 0 25px rgba(50,166,255,.08);
+}
+
+.status-dot{
+    width:8px;
+    height:8px;
+    border-radius:50%;
+    background:#52ffd5;
+    box-shadow:0 0 12px #52ffd5;
+    animation:blink 1.5s infinite;
+}
+
+.hero h1{
+    font-size:clamp(62px,10vw,132px);
+    line-height:.88;
+    letter-spacing:-7px;
+    margin-top:25px;
+    font-weight:900;
+    background:linear-gradient(
+        100deg,
+        #ffffff 5%,
+        #9dd7ff 30%,
+        #866eff 58%,
+        #ef8cff 85%
+    );
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+    text-shadow:0 0 35px rgba(104,95,255,.14);
+}
+
+.hero h1 small{
+    display:block;
+    font-size:clamp(18px,2.5vw,28px);
+    margin-top:24px;
+    letter-spacing:8px;
+    font-weight:600;
+    color:#8ea1c4;
+    -webkit-text-fill-color:#8ea1c4;
+}
+
+.hero p{
+    margin:26px auto 0;
+    max-width:670px;
+    color:var(--muted);
+    line-height:1.8;
+    font-size:15px;
+}
+
+/* CENTRAL ORB */
+
+.core{
+    width:170px;
+    height:170px;
+    margin:42px auto 36px;
+    position:relative;
+    display:grid;
+    place-items:center;
+}
+
+.core-main{
+    width:100px;
+    height:100px;
+    border-radius:50%;
+    background:
+        radial-gradient(circle at 35% 30%,white 0%,#8ff8ff 8%,#468dff 30%,#782fff 62%,#0f1530 80%);
+    box-shadow:
+        0 0 18px rgba(86,238,255,.9),
+        0 0 55px rgba(74,93,255,.75),
+        0 0 110px rgba(133,55,255,.36);
+    animation:coreFloat 4s infinite ease-in-out;
+}
+
+.core-ring{
+    position:absolute;
+    border-radius:50%;
+    border:1px solid rgba(97,202,255,.4);
+}
+
+.r1{
+    inset:0;
+    animation:spin 9s linear infinite;
+}
+
+.r2{
+    inset:18px;
+    border-color:rgba(187,97,255,.35);
+    animation:spinReverse 7s linear infinite;
+}
+
+.r3{
+    inset:-8px;
+    border-style:dashed;
+    border-color:rgba(91,130,255,.25);
+    animation:spin 14s linear infinite;
+}
+
+/* SEARCH */
+
+.search-wrap{
+    max-width:900px;
+    margin:0 auto;
+}
+
+.search-box{
+    min-height:72px;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:10px 11px 10px 20px;
+    border-radius:23px;
+    background:
+        linear-gradient(
+            100deg,
+            rgba(22,30,60,.62),
+            rgba(11,20,48,.78)
+        );
+    border:1px solid rgba(104,163,255,.24);
+    box-shadow:
+        0 0 35px rgba(67,93,255,.13),
+        inset 0 0 25px rgba(85,95,255,.04);
+    backdrop-filter:blur(22px);
+    position:relative;
+    overflow:hidden;
+}
+
+.search-box::before{
+    content:"";
+    position:absolute;
+    top:0;
+    left:-30%;
+    width:20%;
+    height:100%;
+    background:linear-gradient(
+        90deg,
+        transparent,
+        rgba(83,245,255,.3),
+        transparent
+    );
+    transform:skewX(-22deg);
+    animation:scan 4s infinite;
+}
+
+.search-icon{
+    font-size:27px;
+    color:#6ccfff;
+    position:relative;
+    z-index:1;
+}
+
+#query{
+    flex:1;
+    border:none;
+    outline:none;
+    color:white;
+    background:transparent;
+    min-width:0;
+    font-size:18px;
+    padding:13px 5px;
+    position:relative;
+    z-index:1;
+}
+
+#query::placeholder{
+    color:#7887a6;
+}
+
+.search-btn{
+    border:none;
+    min-width:120px;
+    padding:15px 20px;
+    border-radius:16px;
+    color:#fff;
+    font-weight:800;
+    letter-spacing:.3px;
+    cursor:pointer;
+    background:linear-gradient(
+        135deg,
+        #457dff,
+        #884cff
+    );
+    box-shadow:
+        0 0 22px rgba(79,107,255,.4),
+        inset 0 1px 0 rgba(255,255,255,.2);
+    position:relative;
+    z-index:1;
+    transition:.2s;
+}
+
+.search-btn:hover{
+    transform:translateY(-2px) scale(1.02);
+}
+
+.mini{
+    border:none;
+    width:42px;
+    height:42px;
+    border-radius:13px;
+    background:transparent;
+    color:#8494b5;
+    cursor:pointer;
+    font-size:18px;
+    position:relative;
+    z-index:2;
+}
+
+.mini:hover{
+    background:rgba(255,255,255,.05);
+    color:white;
+}
+
+.quick{
+    display:flex;
+    justify-content:center;
+    flex-wrap:wrap;
+    gap:9px;
+    margin:17px 0 40px;
+}
+
+.quick button{
+    border:1px solid rgba(94,145,255,.15);
+    background:rgba(8,16,37,.5);
+    color:#9babc7;
+    border-radius:999px;
+    padding:9px 13px;
+    cursor:pointer;
+    font-size:12px;
+    transition:.2s;
+}
+
+.quick button:hover{
+    color:#fff;
+    border-color:rgba(87,215,255,.45);
+    box-shadow:0 0 16px rgba(63,183,255,.1);
+}
+
+/* PANELS */
+
+.dashboard{
+    display:grid;
+    grid-template-columns:1.35fr .9fr;
+    gap:20px;
+}
+
+.panel{
+    border:1px solid rgba(109,151,255,.16);
+    background:rgba(7,13,29,.58);
+    border-radius:23px;
+    overflow:hidden;
+    box-shadow:var(--shadow);
+    backdrop-filter:blur(18px);
+}
+
+.panel-header{
+    padding:17px 20px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    border-bottom:1px solid rgba(105,144,255,.12);
+    background:rgba(17,27,54,.28);
+}
+
+.panel-title{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    font-size:14px;
+    font-weight:800;
+    letter-spacing:.5px;
+}
+
+.panel-tag{
+    color:#7dcfff;
+    font-size:10px;
+    padding:6px 8px;
+    border:1px solid rgba(83,202,255,.16);
+    border-radius:999px;
+}
+
+.panel-body{
+    padding:20px;
+}
+
+/* AI */
+
+.ai-box{
+    min-height:250px;
+}
+
+.ai-heading{
+    display:flex;
+    gap:13px;
+    align-items:flex-start;
+}
+
+.ai-avatar{
+    width:47px;
+    height:47px;
+    border-radius:15px;
+    display:grid;
+    place-items:center;
+    background:linear-gradient(135deg,#54dfff,#7650ff);
+    box-shadow:
+        0 0 20px rgba(80,186,255,.28),
+        0 0 35px rgba(125,70,255,.15);
+    font-size:21px;
+}
+
+.ai-heading h3{
+    margin-top:2px;
+    font-size:17px;
+}
+
+.ai-heading p{
+    color:var(--muted);
+    font-size:12px;
+    margin-top:5px;
+    line-height:1.5;
+}
+
+.answer{
+    margin-top:18px;
+    padding:17px;
+    border-radius:18px;
+    border:1px solid rgba(98,139,255,.14);
+    background:
+        linear-gradient(
+            120deg,
+            rgba(65,76,181,.08),
+            rgba(75,178,255,.035)
+        );
+    color:#dce5f8;
+    line-height:1.7;
+    font-size:14px;
+    min-height:125px;
+}
+
+.answer a{
+    color:#62d5ff;
+    font-weight:bold;
+}
+
+/* RESULTS */
+
+.result{
+    padding:18px 20px;
+    border-bottom:1px solid rgba(107,144,255,.10);
+    transition:.2s;
+}
+
+.result:last-child{
+    border-bottom:none;
+}
+
+.result:hover{
+    background:rgba(71,103,255,.045);
+}
+
+.result-source{
+    font-size:10px;
+    color:#59d6ff;
+    letter-spacing:.5px;
+    margin-bottom:7px;
+}
+
+.result-title{
+    color:#8dbaff;
+    font-weight:800;
+    font-size:16px;
+    margin-bottom:7px;
+    display:block;
+}
+
+.result-desc{
+    color:#8f9db9;
+    font-size:12px;
+    line-height:1.65;
+}
+
+/* IMAGES */
+
+.image-grid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:12px;
+}
+
+.image-card{
+    min-height:150px;
+    border:1px solid rgba(105,145,255,.12);
+    border-radius:17px;
+    overflow:hidden;
+    position:relative;
+    background:#0a1124;
+}
+
+.image-card img{
+    width:100%;
+    height:150px;
+    object-fit:cover;
+    display:block;
+}
+
+.image-card span{
+    position:absolute;
+    left:8px;
+    right:8px;
+    bottom:8px;
+    padding:8px;
+    background:rgba(3,7,17,.72);
+    border-radius:10px;
+    font-size:10px;
+    backdrop-filter:blur(8px);
+}
+
+/* NEWS */
+
+.news{
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+}
+
+.news-card{
+    padding:14px;
+    border:1px solid rgba(101,144,255,.11);
+    border-radius:15px;
+    background:rgba(10,18,38,.4);
+}
+
+.news-card h3{
+    font-size:13px;
+    line-height:1.5;
+    margin-bottom:7px;
+}
+
+.news-card small{
+    color:#7585a4;
+    font-size:10px;
+}
+
+/* LOADING */
+
+.loading{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    color:#8da1c8;
+}
+
+.loader-dot{
+    width:7px;
+    height:7px;
+    border-radius:50%;
+    background:#67d7ff;
+    animation:bounce .8s infinite alternate;
+}
+
+.loader-dot:nth-child(2){animation-delay:.15s}
+.loader-dot:nth-child(3){animation-delay:.3s}
+
+/* FOOTER */
+
+footer{
+    text-align:center;
+    color:#596883;
+    font-size:11px;
+    letter-spacing:1px;
+    padding-top:34px;
+}
+
+/* ANIMATIONS */
+
+@keyframes orbPulse{
+    0%,100%{transform:scale(1)}
+    50%{transform:scale(1.06)}
+}
+
+@keyframes coreFloat{
+    0%,100%{transform:translateY(0)}
+    50%{transform:translateY(-10px)}
+}
+
+@keyframes spin{
+    from{transform:rotate(0)}
+    to{transform:rotate(360deg)}
+}
+
+@keyframes spinReverse{
+    from{transform:rotate(360deg)}
+    to{transform:rotate(0)}
+}
+
+@keyframes blink{
+    0%,100%{opacity:1}
+    50%{opacity:.3}
+}
+
+@keyframes scan{
+    0%{left:-30%}
+    60%,100%{left:130%}
+}
+
+@keyframes bounce{
+    to{transform:translateY(-5px);opacity:.3}
+}
+
+/* MOBILE */
+
+@media(max-width:900px){
+    .dashboard{
+        grid-template-columns:1fr;
+    }
+}
+
+@media(max-width:650px){
+
+    .app{
+        width:94%;
+    }
+
+    .hero{
+        margin-top:65px;
+    }
+
+    .hero h1{
+        letter-spacing:-4px;
+    }
+
+    .core{
+        transform:scale(.88);
+    }
+
+    .search-box{
+        flex-wrap:wrap;
+        padding:10px;
+    }
+
+    #query{
+        width:calc(100% - 90px);
+    }
+
+    .search-btn{
+        width:100%;
+    }
+
+    .image-grid{
+        grid-template-columns:1fr;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<canvas id="space"></canvas>
+<div class="grid"></div>
+<div class="scanlines"></div>
+
+<div class="app">
+
+<header>
+    <div class="brand">
+        <div class="brand-orb"></div>
+        <div>
+            <h2>NOVA</h2>
+            <span>FUTURE SEARCH SYSTEM</span>
+        </div>
+    </div>
+
+    <div class="header-right">
+        <button class="top-btn" id="themeBtn" title="Toggle theme">◐</button>
+        <button class="top-btn" onclick="clearNova()" title="Reset">↺</button>
+    </div>
+</header>
+
+
+<section class="hero">
+
+    <div class="status">
+        <div class="status-dot"></div>
+        NOVA ONLINE
+    </div>
+
+    <h1>
+        NOVA
+        <small>SEARCH THE FUTURE</small>
+    </h1>
+
+    <p>
+        Search the web, explore knowledge, discover images and find current
+        information through one futuristic interface.
+    </p>
+
+</section>
+
+
+<div class="core">
+    <div class="core-ring r3"></div>
+    <div class="core-ring r1"></div>
+    <div class="core-ring r2"></div>
+    <div class="core-main"></div>
+</div>
+
+
+<section class="search-wrap">
+
+    <div class="search-box">
+
+        <div class="search-icon">⌕</div>
+
+        <input
+            id="query"
+            placeholder="Ask Nova anything..."
+            autocomplete="off"
+        >
+
+        <button class="mini" id="voiceBtn" title="Voice search">🎙</button>
+        <button class="mini" id="clearBtn" title="Clear">×</button>
+
+        <button class="search-btn" onclick="searchNova()">
+            SEARCH
+        </button>
+
+    </div>
+
+    <div class="quick">
+        <button onclick="quickSearch('Artificial Intelligence')">AI</button>
+        <button onclick="quickSearch('Space exploration')">SPACE</button>
+        <button onclick="quickSearch('Quantum computing')">QUANTUM</button>
+        <button onclick="quickSearch('Future technology')">FUTURE</button>
+        <button onclick="quickSearch('Science')">SCIENCE</button>
+        <button onclick="quickSearch('World history')">HISTORY</button>
+    </div>
+
+</section>
+
+
+<section class="dashboard">
+
+    <!-- AI ANSWER -->
+
+    <div class="panel ai-box">
+
+        <div class="panel-header">
+            <div class="panel-title">
+                ✦ NOVA INTELLIGENCE
+                <span class="panel-tag">AI CORE</span>
+            </div>
+
+            <span id="aiStatus" class="panel-tag">READY</span>
+        </div>
+
+        <div class="panel-body">
+
+            <div class="ai-heading">
+
+                <div class="ai-avatar">✦</div>
+
+                <div>
+                    <h3>Nova Answer</h3>
+                    <p>
+                        Public knowledge summary generated from the searched topic.
+                    </p>
+                </div>
+
+            </div>
+
+            <div class="answer" id="answer">
+                Welcome to <b>Nova</b>.<br><br>
+                Type a question or topic above and Nova will search for
+                information and display it here.
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- WEB -->
+
+    <div class="panel">
+
+        <div class="panel-header">
+            <div class="panel-title">
+                🌐 WEB RESULTS
+            </div>
+
+            <span class="panel-tag" id="count">0</span>
+        </div>
+
+        <div id="webResults">
+            <div class="result">
+                <div class="result-source">NOVA WEB</div>
+                <div class="result-desc">
+                    Search something to load web links.
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+    <!-- IMAGES -->
+
+    <div class="panel">
+
+        <div class="panel-header">
+            <div class="panel-title">
+                ◈ IMAGE SEARCH
+            </div>
+
+            <a id="imageLink"
+               class="panel-tag"
+               href="#"
+               target="_blank">
+               OPEN
+            </a>
+        </div>
+
+        <div class="panel-body">
+
+            <div class="image-grid" id="images">
+
+                <div class="result-desc"
+                     style="grid-column:1/-1;">
+                    Search a topic to discover images.
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- NEWS -->
+
+    <div class="panel">
+
+        <div class="panel-header">
+
+            <div class="panel-title">
+                ◉ NEWS STREAM
+            </div>
+
+            <a id="newsLink"
+               class="panel-tag"
+               href="#"
+               target="_blank">
+               LIVE
+            </a>
+
+        </div>
+
+        <div class="panel-body">
+
+            <div class="news" id="news">
+
+                <div class="news-card">
+                    <h3>
+                        Search a topic to explore the current news stream.
+                    </h3>
+                    <small>NOVA NEWS</small>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<footer>
+    NOVA • FUTURE SEARCH SYSTEM • SINGLE FILE EDITION
+</footer>
+
+</div>
+
+
+<script>
+
+/* ===============================
+   SPACE PARTICLES
+================================ */
+
+const canvas = document.getElementById("space");
+const ctx = canvas.getContext("2d");
+
+let particles = [];
+
+function resizeCanvas(){
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+}
+
+resizeCanvas();
+window.addEventListener("resize", resizeCanvas);
+
+for(let i=0;i<120;i++){
+
+    particles.push({
+        x:Math.random()*window.innerWidth,
+        y:Math.random()*window.innerHeight,
+        r:Math.random()*1.5+.3,
+        vx:(Math.random()-.5)*.25,
+        vy:(Math.random()-.5)*.25,
+        a:Math.random()*.7+.1
+    });
+
+}
+
+function animateSpace(){
+
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+
+    particles.forEach(p=>{
+
+        p.x += p.vx;
+        p.y += p.vy;
+
+        if(p.x<0)p.x=canvas.width;
+        if(p.x>canvas.width)p.x=0;
+
+        if(p.y<0)p.y=canvas.height;
+        if(p.y>canvas.height)p.y=0;
+
+        ctx.beginPath();
+        ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+
+        ctx.fillStyle=`rgba(125,190,255,${p.a})`;
+
+        ctx.fill();
+
+    });
+
+    requestAnimationFrame(animateSpace);
+}
+
+animateSpace();
+
+
+/* ===============================
+   ELEMENTS
+================================ */
+
+const queryInput=document.getElementById("query");
+const answer=document.getElementById("answer");
+const aiStatus=document.getElementById("aiStatus");
+const webResults=document.getElementById("webResults");
+const images=document.getElementById("images");
+const news=document.getElementById("news");
+const count=document.getElementById("count");
+const clearBtn=document.getElementById("clearBtn");
+const themeBtn=document.getElementById("themeBtn");
+
+
+/* ===============================
+   SEARCH
+================================ */
+
+queryInput.addEventListener("keydown",(e)=>{
+    if(e.key==="Enter"){
+        searchNova();
+    }
+});
+
+
+function quickSearch(text){
+    queryInput.value=text;
+    searchNova();
+}
+
+
+async function searchNova(){
+
+    const q=queryInput.value.trim();
+
+    if(!q){
+        queryInput.focus();
+        return;
+    }
+
+    const encoded=encodeURIComponent(q);
+
+    aiStatus.textContent="SEARCHING";
+
+    answer.innerHTML=`
+        <div class="loading">
+            Nova is scanning public knowledge
+            <span class="loader-dot"></span>
+            <span class="loader-dot"></span>
+            <span class="loader-dot"></span>
+        </div>
+    `;
+
+
+    /* WEB LINKS */
+
+    const google=
+        `https://www.google.com/search?q=${encoded}`;
+
+    const imagesUrl=
+        `https://www.google.com/search?tbm=isch&q=${encoded}`;
+
+    const newsUrl=
+        `https://news.google.com/search?q=${encoded}`;
+
+
+    document.getElementById("imageLink").href=imagesUrl;
+    document.getElementById("newsLink").href=newsUrl;
+
+
+    webResults.innerHTML=`
+
+        <div class="result">
+            <div class="result-source">GOOGLE WEB</div>
+
+            <a
+                class="result-title"
+                href="${google}"
+                target="_blank"
+            >
+                Search "${escapeHTML(q)}"
+            </a>
+
+            <div class="result-desc">
+                Open the live web search for current pages and websites.
+            </div>
+        </div>
+
+
+        <div class="result">
+            <div class="result-source">WIKIPEDIA</div>
+
+            <a
+                class="result-title"
+                href="https://en.wikipedia.org/wiki/Special:Search?search=${encoded}"
+                target="_blank"
+            >
+                Explore "${escapeHTML(q)}"
+            </a>
+
+            <div class="result-desc">
+                Browse encyclopedia information and reference articles.
+            </div>
+        </div>
+
+
+        <div class="result">
+            <div class="result-source">NEWS</div>
+
+            <a
+                class="result-title"
+                href="${newsUrl}"
+                target="_blank"
+            >
+                Latest news about "${escapeHTML(q)}"
+            </a>
+
+            <div class="result-desc">
+                Open a live news search for the topic.
+            </div>
+        </div>
+
+    `;
+
+    count.textContent="3";
+
+
+    await wikiAnswer(q);
+    await wikiImages(q);
+
+    news.innerHTML=`
+
+        <div class="news-card">
+            <h3>
+                Latest news for "${escapeHTML(q)}"
+            </h3>
+            <small>GOOGLE NEWS • LIVE SEARCH</small>
+        </div>
+
+        <div class="news-card">
+            <h3>
+                Recent articles and headlines
+            </h3>
+            <small>LIVE WEB RESULTS</small>
+        </div>
+
+        <div class="news-card">
+            <h3>
+                Related stories and updates
+            </h3>
+            <small>NOVA NEWS STREAM</small>
+        </div>
+
+    `;
+
+    aiStatus.textContent="ONLINE";
+}
+
+
+/* ===============================
+   WIKIPEDIA ANSWER
+================================ */
+
+async function wikiAnswer(q){
+
+    try{
+
+        const searchUrl=
+            `https://en.wikipedia.org/w/rest.php/v1/search/title?q=${encodeURIComponent(q)}&limit=1`;
+
+        const response=await fetch(searchUrl);
+
+        if(!response.ok)
+            throw new Error();
+
+        const data=await response.json();
+
+        if(!data.pages || !data.pages.length){
+
+            answer.innerHTML=`
+                <b>No matching public knowledge article found.</b>
+                <br><br>
+                Try another topic or use the web results.
+            `;
+
+            return;
+        }
+
+        const title=data.pages[0].title;
+
+        const summaryUrl=
+            `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(title)}`;
+
+        const summaryResponse=await fetch(summaryUrl);
+
+        if(!summaryResponse.ok)
+            throw new Error();
+
+        const info=await summaryResponse.json();
+
+        const text=
+            info.extract ||
+            "No summary was available for this topic.";
+
+        const link=
+            info.content_urls?.desktop?.page ||
+            `https://en.wikipedia.org/wiki/${encodeURIComponent(title)}`;
+
+        answer.innerHTML=`
+
+            <b>${escapeHTML(title)}</b>
+
+            <br><br>
+
+            ${escapeHTML(text)}
+
+            <br><br>
+
+            <a href="${link}" target="_blank">
+                READ FULL ARTICLE ↗
+            </a>
+
+        `;
+
+    }catch{
+
+        answer.innerHTML=`
+            <b>Nova couldn't reach the knowledge source.</b>
+            <br><br>
+            You can still use the Web, Images and News sections.
+        `;
+    }
+}
+
+
+/* ===============================
+   WIKIPEDIA IMAGES
+================================ */
+
+async function wikiImages(q){
+
+    images.innerHTML=`
+        <div class="result-desc" style="grid-column:1/-1;">
+            Loading visual data...
+        </div>
+    `;
+
+    try{
+
+        const url=
+            `https://en.wikipedia.org/w/rest.php/v1/search/page?q=${encodeURIComponent(q)}&limit=8`;
+
+        const response=await fetch(url);
+
+        if(!response.ok)
+            throw new Error();
+
+        const data=await response.json();
+
+        const pages=(data.pages||[]).filter(
+            p=>p.thumbnail && p.thumbnail.url
+        ).slice(0,4);
+
+
+        if(!pages.length){
+
+            images.innerHTML=`
+                <div class="result-desc"
+                     style="grid-column:1/-1;">
+                    No preview images found.
+                </div>
+            `;
+
+            return;
+        }
+
+
+        images.innerHTML=pages.map(p=>`
+
+            <a
+                class="image-card"
+                href="https://en.wikipedia.org/wiki/${encodeURIComponent(p.title)}"
+                target="_blank"
+            >
+
+                <img
+                    src="${p.thumbnail.url}"
+                    alt="${escapeHTML(p.title)}"
+                    loading="lazy"
+                >
+
+                <span>
+                    ${escapeHTML(p.title)}
+                </span>
+
+            </a>
+
+        `).join("");
+
+
+    }catch{
+
+        images.innerHTML=`
+            <div class="result-desc"
+                 style="grid-column:1/-1;">
+                Image previews are unavailable right now.
+            </div>
+        `;
+    }
+}
+
+
+/* ===============================
+   CLEAR
+================================ */
+
+clearBtn.addEventListener("click",clearNova);
+
+function clearNova(){
+
+    queryInput.value="";
+
+    answer.innerHTML=`
+        Welcome to <b>Nova</b>.<br><br>
+        Type a question or topic above and Nova will search for
+        information and display it here.
+    `;
+
+    webResults.innerHTML=`
+        <div class="result">
+            <div class="result-source">NOVA WEB</div>
+            <div class="result-desc">
+                Search something to load web links.
+            </div>
+        </div>
+    `;
+
+    images.innerHTML=`
+        <div class="result-desc" style="grid-column:1/-1;">
+            Search a topic to discover images.
+        </div>
+    `;
+
+    news.innerHTML=`
+        <div class="news-card">
+            <h3>
+                Search a topic to explore the current news stream.
+            </h3>
+            <small>NOVA NEWS</small>
+        </div>
+    `;
+
+    count.textContent="0";
+    aiStatus.textContent="READY";
+
+    queryInput.focus();
+}
+
+
+/* ===============================
+   DARK / LIGHT EFFECT
+================================ */
+
+themeBtn.addEventListener("click",()=>{
+
+    document.body.style.background=
+        document.body.style.background
+        ? ""
+        : "#070a14";
+
+});
+
+
+/* ===============================
+   VOICE SEARCH
+================================ */
+
+document.getElementById("voiceBtn").addEventListener("click",()=>{
+
+    const SpeechRecognition=
+        window.SpeechRecognition ||
+        window.webkitSpeechRecognition;
+
+    if(!SpeechRecognition){
+
+        alert("Voice search is not supported in this browser.");
+
+        return;
+    }
+
+    const recognition=new SpeechRecognition();
+
+    recognition.lang="en-US";
+
+    recognition.onstart=()=>{
+        document.getElementById("voiceBtn").textContent="🔴";
+    };
+
+    recognition.onresult=(event)=>{
+
+        queryInput.value=
+            event.results[0][0].transcript;
+
+        searchNova();
+
+    };
+
+    recognition.onend=()=>{
+        document.getElementById("voiceBtn").textContent="🎙";
+    };
+
+    recognition.start();
+
+});
+
+
+/* ===============================
+   SECURITY
+================================ */
+
+function escapeHTML(text){
+
+    return String(text)
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+}
+
+</script>
+
+</body>
+</html>
+```
